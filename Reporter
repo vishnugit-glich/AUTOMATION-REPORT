@@ -1,0 +1,41 @@
+import pandas as pd
+from fpdf import FPDF
+
+data = pd.read_csv("data.csv")
+
+summary = {
+    "Total Records": len(data),
+    "Average Score": round(data["Score"].mean(), 2),
+    "Max Score": data["Score"].max(),
+    "Min Score": data["Score"].min(),
+    "Average Age": round(data["Age"].mean(), 2)
+}
+
+pdf = FPDF()
+pdf.add_page()
+pdf.set_font("Arial", "B", 16)
+pdf.cell(200, 10, "Automated Data Report", ln=1, align="C")
+
+pdf.set_font("Arial", "", 12)
+pdf.ln(10)
+pdf.cell(200, 10, "Summary Statistics", ln=1)
+
+for key, value in summary.items():
+    pdf.cell(200, 10, f"{key}: {value}", ln=1)
+
+pdf.ln(10)
+pdf.cell(200, 10, "Detailed Data", ln=1)
+
+col_widths = [60, 40, 40]
+headers = data.columns.tolist()
+
+for i, header in enumerate(headers):
+    pdf.cell(col_widths[i], 10, header, border=1)
+pdf.ln()
+
+for _, row in data.iterrows():
+    for i, item in enumerate(row):
+        pdf.cell(col_widths[i], 10, str(item), border=1)
+    pdf.ln()
+
+pdf.output("report.pdf")
